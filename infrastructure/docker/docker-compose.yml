@@ -1,0 +1,88 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: sin-postgres
+    environment:
+      POSTGRES_DB: sin_engine
+      POSTGRES_USER: sin_admin
+      POSTGRES_PASSWORD: SinEngine@123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ../../databases/postgres/migrations:/docker-entrypoint-initdb.d
+    networks:
+      - sin-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sin_admin"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: sin-redis
+    command: redis-server --requirepass SinEngine@123
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - sin-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api-gateway:
+    build: ../../backend/api-gateway
+    container_name: sin-api-gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_USER=sin_admin
+      - POSTGRES_PASSWORD=SinEngine@123
+      - POSTGRES_DB=sin_engine
+      - REDIS_URL=redis://:SinEngine@123@redis:6379
+      - JWT_SECRET=your-256-bit-secret-key-change-this
+    networks:
+      - sin-network
+    restart: unless-stopped
+
+  auth-service:
+    build: ../../backend/auth-service
+    container_name: sin-auth-service
+    ports:
+      - "8081:8081"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_USER=sin_admin
+      - POSTGRES_PASSWORD=SinEngine@123
+      - POSTGRES_DB=sin_engine
+      - REDIS_URL=redis://:SinEngine@123@redis:6379
+      - JWT_SECRET=your-256-bit-secret-key-change-this
+    networks:
+      - sin-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  sin-network:
+    driver: bridge

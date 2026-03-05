@@ -1,0 +1,63 @@
+# Binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Go workspace file
+go.work
+
+# Vendor directory (if using modules)
+# vendor/
+
+# Build output
+bin/
+dist/
+build/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Data files
+data/crawls/*
+data/breaches/*
+data/dorks/*
+data/reports/*
+data/scans/*
+!data/crawls/.gitkeep
+!data/breaches/.gitkeep
+!data/dorks/.gitkeep
+!data/reports/.gitkeep
+!data/scans/.gitkeep
+
+# Backups
+backups/daily/*
+backups/weekly/*
+backups/monthly/*
+!backups/daily/.gitkeep
+!backups/weekly/.gitkeep
+!backups/monthly/.gitkeep
+
+# Temp files
+temp/*
+*.tmp
