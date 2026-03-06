@@ -16,3 +16,19 @@ services:
         value: "release"
       - key: LOG_LEVEL
         value: "info"
+      # Database Configuration - Will be auto-populated when you connect PostgreSQL
+      # For now, using placeholder - Replace with your DATABASE_URL after creating PostgreSQL
+      - key: DATABASE_URL
+        sync: false
+      - key: DB_HOST
+        sync: false
+      - key: DB_PORT
+        value: "5432"
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: DB_NAME
+        value: "sin_engine"
+      - key: DB_SSLMODE
+        value: "disable"
