@@ -3,12 +3,18 @@ FROM golang:1.21-alpine AS builder
 
 WORKDIR /app
 
-# Copy go.mod and go.sum from root context (they need to be in root)
+# Copy go.mod and go.sum files first (for caching)
 COPY backend/api-gateway/go.mod backend/api-gateway/go.sum ./
+
+# Copy pkg go.mod for dependency resolution
+COPY backend/pkg/go.mod ./pkg/
+
+# Download dependencies
 RUN go mod download
 
-# Copy source code from backend/api-gateway
+# Copy source code
 COPY backend/api-gateway/ .
+COPY backend/pkg/ ./pkg/
 
 # Build the binary
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o api-gateway .
