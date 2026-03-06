@@ -46,4 +46,4 @@ require (
 )
 
 // Replace local pkg with relative path
-replace github.com/sin-engine/pkg/database => ../pkg/database
+replace github.com/sin-engine/pkg/database => ../pkg
