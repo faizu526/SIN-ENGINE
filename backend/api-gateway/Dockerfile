@@ -2,10 +2,10 @@ FROM golang:1.21-alpine AS builder
 
 WORKDIR /app
 
-COPY go.mod go.sum ./
+COPY backend/api-gateway/go.mod backend/api-gateway/go.sum ./
 RUN go mod download
 
-COPY . .
+COPY backend/api-gateway/ .
 RUN go build -o api-gateway .
 
 FROM alpine:latest
