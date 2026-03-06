@@ -3,14 +3,20 @@ FROM golang:1.21-alpine AS builder
 
 WORKDIR /app
 
-# Copy entire project first (needed for go mod with local replace)
-COPY . /app
+# Copy go.mod and go.sum first
+COPY backend/api-gateway/go.mod backend/api-gateway/go.sum ./
 
-# Download dependencies
-RUN cd /app/backend/api-gateway && go mod download
+# Copy pkg directory
+COPY backend/pkg ./pkg
+
+# Download dependencies (vendor approach)
+RUN go mod download && go mod vendor
+
+# Copy source code
+COPY backend/api-gateway/ .
 
 # Build the binary
-RUN cd /app/backend/api-gateway && CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o api-gateway .
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o api-gateway .
 # Runtime Stage
 FROM alpine:latest
 
@@ -18,7 +24,7 @@ RUN apk --no-cache add ca-certificates
 
 WORKDIR /root/
 
-COPY --from=builder /app/backend/api-gateway/api-gateway .
+COPY --from=builder /app/api-gateway .
 
 EXPOSE 8080
 
